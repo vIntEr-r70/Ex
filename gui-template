@@ -1,4 +1,121 @@
 Template gui
 {
-	
-}
+    title = "УИТ-400";
+    pos = { x: 0, y: 0 };
+    size = { w: 800, h: 600 };
+    font = { name: "Arial", size: 14 };
+    font.bold = true;
+    font.italic = false;
+
+    Stack("wnd")
+    {
+    	item = { return zrk.online ? "main" : item; }
+    	
+    	event(item) = { gmap.current_window = item; }
+    	
+        vWindow("main")
+        {
+            Label() {
+                text = "ГЛАВНОЕ ОКНО";
+            }
+
+            hWindow()
+            {
+                Label("lbl_online")
+                {
+                    text = "Автоном";
+                    bgcolor = zrk.online ? nil : 0x00FF00;
+                }
+
+                Label()
+                {
+                    text = "Комплекс";
+                    bgcolor = { zrk.online ? 0x00FF00 : nil; }
+                }
+
+                Button("Тест")
+                {
+                    onclicked = { main.begin_test(); }
+                }
+
+                Spacer();
+                Label("Наработка: {} ч.");
+                Button("Выход");
+            }
+
+            hWindow()
+            {
+                Button("ДТ №001 - ДТ №100");
+                Button("ДТ №101 - ДТ №200");
+
+                vWindow()
+                {
+                    Label("Температура");
+                    Button("°C");
+                }
+
+                Button("ДТ №201 - ДТ №300");
+                Button("ДТ №301 - ДТ №400");
+            }
+
+            hWindow()
+            {
+                for (uint32 i = 0; i < 5; ++i)
+                    Button("ДТ №{} - ДТ №{}");
+            }
+
+            gWindow()
+            {
+                for (uint32 r = 0; r < 4; ++r)
+                {
+                    for (uint32 c = 0; c < 5; ++c)
+                    {
+                        vWindow(r, c)
+                        {
+                            hWindow()
+                            {
+                                Label("ДТ №{}");
+                                Label("Точка №{}");
+                            }
+                            Label("{}");
+                            Label("{}");
+                        }
+                    }
+                }
+            }
+
+            hWindow()
+            {
+                Button("ПУСК");
+                Button("СТОП");
+
+                vWindow()
+                {
+                    Label("ДАТА И ВРЕМЯ");
+                    hWindow()
+                    {
+                        Label("{}");
+                        Label("{}");
+                    }
+                }
+
+                vWindow()
+                {
+                    Label("ВРЕМЯ РАБОТЫ");
+                    Label("{}");
+                }
+
+                vWindow()
+                {
+                    Label("ИЗМЕРЕНИЕ");
+                    hWindow()
+                    {
+                        Label();
+                        Label();
+                    }
+                }
+            }
+        }
+    }
+};
+
