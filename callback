@@ -1,0 +1,134 @@
+
+#include <vector>
+#include <functional>
+#include <iostream>
+#include <memory>
+
+class base_call {
+
+};
+
+
+class callback
+{
+    struct impl_base;
+    typedef std::shared_ptr<impl_base> shared_base_type;
+
+    struct impl_base
+    {
+        inline virtual ~impl_base()
+        {}
+        virtual void call(base_call &) = 0;
+    };
+
+    template <class Function>
+    struct impl
+        : public impl_base
+    {
+        typedef void (base_call::*func_type)();
+
+        impl(Function &f)
+            : func(f) {
+        }
+
+        void call(base_call &handler)
+        {
+            (handler.*func)();
+        }
+
+        func_type func;
+    };
+
+public:
+
+    template <class Function>
+    callback(Function &&f)
+        : cb_(std::make_shared<impl<Function>>(f)) {
+    }
+
+    void call(base_call &handler)
+    {
+        if (cb_)
+            cb_->call(handler);
+    }
+
+    void reset() {
+        cb_.reset();
+    }
+
+    bool is_null() const {
+        return (cb_) ? false : true;
+    }
+
+private:
+
+    shared_base_type cb_;
+};
+
+
+class core
+    : public base_call
+{
+public:
+
+    void init() {
+        std::cout << "core::Init" << std::endl;
+    }
+
+    void start() {
+        std::cout << "core::Start" << std::endl;
+    }
+
+    void stop() {
+        std::cout << "core::Stop" << std::endl;
+    }
+
+    void close() {
+        std::cout << "core::Close" << std::endl;
+    }
+};
+
+class unit
+    : public base_call
+{
+public:
+
+    void init() {
+        std::cout << "unit::Init" << std::endl;
+    }
+
+    void close() {
+        std::cout << "unit::Close" << std::endl;
+    }
+};
+
+struct table_record
+{
+    std::vector<callback> funcs_;
+};
+
+int main()
+{
+    std::vector<table_record> tbl;
+
+    {
+        table_record rec;
+        rec.funcs_.emplace_back(&core::init);
+        rec.funcs_.emplace_back(&core::start);
+        rec.funcs_.emplace_back(&core::stop);
+        rec.funcs_.emplace_back(&core::close);
+        tbl.emplace_back(rec);
+    }
+
+    {
+        table_record rec;
+        rec.funcs_.emplace_back(&unit::init);
+        rec.funcs_.emplace_back(&unit::close);
+        tbl.emplace_back(rec);
+    }
+
+//    core obj;
+//    (tbl[0].func[0])(obj);
+
+    return 0;
+}
