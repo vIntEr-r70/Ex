@@ -1,0 +1,109 @@
+
+#include <vector>
+#include <functional>
+#include <iostream>
+#include <memory>
+
+struct base_call {
+
+};
+
+
+class core
+    : public base_call
+{
+public:
+
+    void init() {
+        std::cout << "core::Init" << std::endl;
+    }
+
+    void start() {
+        std::cout << "core::Start" << std::endl;
+    }
+
+    void stop() {
+        std::cout << "core::Stop" << std::endl;
+    }
+
+    void close() {
+        std::cout << "core::Close" << std::endl;
+    }
+};
+
+class unit
+    : public base_call
+{
+public:
+
+    void init() {
+        std::cout << "unit::Init" << std::endl;
+    }
+
+    void close() {
+        std::cout << "unit::Close" << std::endl;
+    }
+};
+
+
+
+template <typename T>
+struct delegate
+{
+    void (T::*f_)();
+
+    delegate(void (T::*f)())
+        : f_(f) {
+    }
+
+    void operator() (base_call &base)
+    {
+        (static_cast<T&>(base).*f_)();
+    }
+};
+
+template <typename T>
+delegate<T> make_delegate(void (T::*f)())
+{
+    delegate<T> d(f);
+    return d;
+}
+
+
+struct table_record
+{
+    std::vector<std::function<void(base_call &)>> funcs_;
+};
+
+int main()
+{
+    std::vector<table_record> tbl;
+
+    {
+        table_record rec;
+        rec.funcs_.emplace_back(make_delegate(&core::init));
+        rec.funcs_.emplace_back(make_delegate(&core::start));
+        rec.funcs_.emplace_back(make_delegate(&core::stop));
+        rec.funcs_.emplace_back(make_delegate(&core::close));
+        tbl.emplace_back(rec);
+    }
+
+    {
+        table_record rec;
+        rec.funcs_.emplace_back(make_delegate(&unit::init));
+        rec.funcs_.emplace_back(make_delegate(&unit::close));
+        tbl.emplace_back(rec);
+    }
+
+    core core_obj;
+    tbl[0].funcs_[0](core_obj);
+    tbl[0].funcs_[1](core_obj);
+    tbl[0].funcs_[3](core_obj);
+    tbl[0].funcs_[2](core_obj);
+
+    unit unit_obj;
+    tbl[1].funcs_[0](unit_obj);
+    tbl[1].funcs_[1](unit_obj);
+
+    return 0;
+}
