@@ -1,0 +1,77 @@
+vLayout
+{
+	hLayout
+	{
+		Button
+		Button
+		Label
+		Button
+		Button
+	}
+
+	hLayout
+	{
+		Button
+		{
+			onPress: { start(); }
+		}
+		Button
+		{
+			onPress: { stop(); }
+		}
+	}	
+
+	hLayout
+	{
+		Label
+		Label
+		Label
+		Label
+		Label
+	}
+}
+
+comport
+{
+	port: "/dev/ttyS0"
+
+	unit
+	{
+		
+	}
+}
+
+
+icop
+{
+	address: 0x300
+	read()
+	write()
+}
+
+icop
+{
+	address: 0x304
+	read()
+	write()
+}
+
+start()
+{
+	uInt32 i_set = 0;
+
+	while (true)
+	{
+		comport.usiu.setI()
+		sleep(1);
+	}
+
+	
+}
+
+stop()
+{
+}
+
+
+
