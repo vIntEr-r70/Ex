@@ -60,13 +60,16 @@ start()
 {
 	uInt32 i_set = 0;
 
-	while (true)
+	while (i_set < 100000)
 	{
-		comport.usiu.setI()
+		comport.usiu.setI(i_set);
+		
+		i_set += 1000;
+		if (i_set > 100000)
+			i_set = 100000;
+			
 		sleep(1);
 	}
-
-	
 }
 
 stop()
