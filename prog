@@ -13,11 +13,11 @@ vLayout
 	{
 		Button
 		{
-			onPress: { start(); }
+			onPress: { main::start(); }
 		}
 		Button
 		{
-			onPress: { stop(); }
+			onPress: { main::stop(); }
 		}
 	}	
 
@@ -43,21 +43,17 @@ comport
 }
 
 
-icop
+icop XP1
 {
 	address: 0x300
-	read()
-	write()
 }
 
-icop
+icop XP2
 {
 	address: 0x304
-	read()
-	write()
 }
 
-object code main
+script main
 {
 	Float32 iA_ = 0.00;
 
