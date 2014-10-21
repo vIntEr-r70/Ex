@@ -37,8 +37,9 @@ comport
 
 	unit
 	{
-		
+		// Задание уставки тока	
 	}
+	
 }
 
 
@@ -56,24 +57,42 @@ icop
 	write()
 }
 
-start()
+object code main
 {
-	uInt32 i_set = 0;
+	Float32 iA_ = 0.00;
 
-	while (i_set < 100000)
+	start()
 	{
-		comport.usiu.setI(i_set);
-		
-		i_set += 1000;
-		if (i_set > 100000)
-			i_set = 100000;
-			
-		sleep(1);
+		past_i_to_unit(0);
+		icop.Power = 1;
+		past_i_to_unit(gui.iA);
 	}
-}
+	
+	stop()
+	{
+		past_i_to_unit(0);
+		icop.Power = 0;
+	}
+	
+	void past_i_to_unit(Float32 iA)
+	{
+		// Скорость 1А в секунду
+		Float32 step = (iA_ > iA) ? -1 : 1;
+		
+		while (true)
+		{
+			iA_ += step;
+			if ((step < 0 && iA_ < iA) || (step > 0 && iA_ > iA))  
+				iA_ = iA;
 
-stop()
-{
+			comport.usiu.setI(iA_);
+			if (iA_ == iA)
+				break;
+			
+			sleep(1);
+		}		
+	}
+	
 }
 
 
