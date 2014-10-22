@@ -1,0 +1,56 @@
+object DtLevel
+{
+    uInt16 select_mask_[10];
+    object<nick_devices, dt10> dt_[10];
+    
+    start()
+    {
+        async
+        {
+            for (uInt32 i = 0; i < 10; ++i)
+                dt_[i].start(select_mask_[i]);
+        }
+            
+        exception
+        {
+            stop();
+        }
+    }
+    
+    stop()
+    {
+        async
+        {
+            for (uInt32 i = 0; i < 10; ++i)
+                dt_[i].start(0);
+        }
+    }
+}
+
+object Launcher
+{
+    DtLevel levels_[4];
+    
+    start()
+    {
+        async
+        {
+            for (uInt32 i = 0; i < 4; ++i)
+                levels_[i].start();
+        }
+        
+        exception
+        {
+            stop();
+        }
+    }
+    
+    stop()
+    {
+        async
+        {
+            for (uInt32 i = 0; i < 4; ++i)
+                levels_[i].stop();
+        }
+    }
+}
