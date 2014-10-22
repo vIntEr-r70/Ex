@@ -56,17 +56,86 @@ object Launcher
     
 } launcher;
 
+template GuiTemplate
+{
+    size: { w: 800, h: 600 }
+    bgcolor: 0x808080
+    
+    vLayout
+    {
+        uInt32 page_id_;
+        uInt32 sub_id_[4];
+    
+        hLayout
+        {
+            for (uInt32 i = 0; i < 4; ++i)
+            {
+                ToggleButton
+                {
+                    checked: { page_id_ == i; }
+                    bgcolor: { (page_id_ == i) ? 0x00FF00 : nill; }
+                    
+                    clicked(bool state)
+                    {
+                        if (!state)
+                            return;
+                            
+                        page_id_ = i;
+                        gui_settings_handler::switch_page(i * 100 + sub_id_[i] * 10);
+                    }
+                }
+            }
+        }
+        
+        hLayout
+        {
+            for (uInt32 i = 0; i < 10; ++i)
+            {
+                ToggleButton
+                {
+                    checked: { sub_id_[page_id_] == i; }
+                    bgcolor: { (sub_id_[page_id_] == i) ? 0x00FF00 : nill; }
+
+                    clicked(bool state)
+                    {
+                        if (!state)
+                            return;
+                        
+                        sub_id_[page_id_] = i;
+                        gui_settings_handler::switch_page(page_id_ * 100 + i * 10);
+                    }
+                }
+            }
+        }
+        
+        for (uInt32 i = 0; i < 10; ++i)
+        {
+            hLayout
+            {
+                ToggleButton;
+            
+                Button;
+                Button;
+                Label;
+                Button;
+                Button;
+                
+                Button;
+                Label;
+                Button;
+                
+                Button;
+            }
+        }
+    }
+}
+
+
+
 main()
 {
-    for (uInt32 l = 0; l < 4; ++l)
-    {
-        for (uInt32 dtl = 0; dtl < 10; ++dtl)
-            launcher.levels_[l].select_mask_[dtl] = 0x3FF;
-    }
-
-    launcher.start();
-    
-    launcher.stop();
+    object<qt4> gui(GuiTemplate); 
+    gui.exec();
 }
 
 
