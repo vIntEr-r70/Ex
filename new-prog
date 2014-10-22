@@ -53,4 +53,21 @@ object Launcher
                 levels_[i].stop();
         }
     }
+    
+} launcher;
+
+main()
+{
+    for (uInt32 l = 0; l < 4; ++l)
+    {
+        for (uInt32 dtl = 0; dtl < 10; ++dtl)
+            launcher.levels_[l].select_mask_[dtl] = 0x3FF;
+    }
+
+    launcher.start();
+    
+    launcher.stop();
 }
+
+
+
