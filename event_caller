@@ -1,0 +1,104 @@
+template <typename Type>
+struct ExType
+{
+template<class T>
+struct enable_if<true, T> { typedef T type; };
+
+
+    template <typename T>
+    void set(T const&)
+    {
+        std::cout << "Need CAST" << std::endl;
+    }
+
+    void set(Type const&)
+    {
+        std::cout << "OK" << std::endl;
+    }
+};
+
+struct uInt32
+    : ExType<unsigned int>
+{ };
+
+struct Int32
+    : ExType<int>
+{ };
+
+struct uInt16
+    : ExType<unsigned short>
+{ };
+
+struct Int16
+    : ExType<short>
+{ };
+
+struct uInt8
+    : ExType<unsigned char>
+{ };
+
+struct Int8
+    : ExType<char>
+{ };
+
+
+template <typename... Types>
+class Event
+{
+    template <typename First, typename... Rest>
+    class Helper
+        : public First
+    {
+    public:
+
+        template <typename Arg, typename... Args>
+        void check(Arg const&arg, Args const& ...args)
+        {
+            this->set(arg);
+            Helper<Rest...> helper;
+            helper.check(args...);
+        }
+
+        template <typename Arg>
+        void check(Arg const &arg)
+        {
+            this->set(arg);
+        }
+    };
+
+public:
+
+    template <typename... Args>
+    void call(Args const &...args)
+    {
+        Helper<Types...> helper;
+        helper.check(args...);
+    }
+
+    void call() {
+    }
+};
+
+
+class AllEvent
+{
+public:
+
+    template <typename... Args>
+    void call(Args const &...args)
+    {
+        ptr_->call(args...);
+    }
+    
+private:
+
+    Event* ptr_;
+};
+
+
+template <typename... Args>
+AllEvent &create_event(char const *)
+{
+    return *(new Event<Args...>());
+}
+
