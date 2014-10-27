@@ -1,19 +1,11 @@
 template <typename Type>
 struct ExType
 {
-template<class T>
-struct enable_if<true, T> { typedef T type; };
-
-
-    template <typename T>
-    void set(T const&)
+    template <typename U, typename = typename
+        std::enable_if<std::is_same<T, U>::value, T>::type>
+    void set(U&&)
     {
         std::cout << "Need CAST" << std::endl;
-    }
-
-    void set(Type const&)
-    {
-        std::cout << "OK" << std::endl;
     }
 };
 
